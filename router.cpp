@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
     if (argc != 4) {
         errorMsg("Invalid input format"); 
     }
-    portno = atoi(argv[1]);
+    portno = atoi(argv[2]);
 
     //initialize program
     cout<<"Starting router..."<<endl;
@@ -96,6 +96,9 @@ int main(int argc, char *argv[])
     cout<<"Initializing receiver...Done"<<endl;
     cout<<"Initializing buffer...";
     buf = new char[MAX_BUFFER_SIZE];
+    cout<<"Done"<<endl;
+
+    cout<<"Listening on port "<<portno<<"..."<<endl;
 
     while(1) 
         {
