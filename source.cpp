@@ -4,10 +4,8 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
+#include "packet.h"
 using namespace std;
-
-#define BUFFER_LIMIT 64
-#define MAX_BUFFER_SIZE 200
 
 typedef struct thdata{
 float service_rate;
@@ -52,7 +50,6 @@ int main(int argc, char *argv[])
     socklen_t len;
     struct sockaddr_in svrAddr, cliAddr;
     struct hostent *server;
-    char *buf;
     float delay;
     int senderID, receiverID, packetCount;
 
@@ -118,12 +115,20 @@ int main(int argc, char *argv[])
 
     len = sizeof(svrAddr);
 
-    buf = new char[MAX_BUFFER_SIZE];
     //start sending packets
     for (int x = 1; x <= packetCount; x++)
         {
-        strcpy(buf, "test 1234567");
-        if(sendto(sockfd, buf, 4, 0, (struct sockaddr *)&svrAddr, len)==-1) error("Unable to send packet.");
+        /************************TO DO ****************************************
+         * * send out with a poisson distribution, with mean of delay ms/packet
+         * *********************************************************************/
+
+        //construct a packet
+        packet p;
+        p.sequenceNumber = x;
+        p.source = senderID;
+        p.destination = receiverID;
+
+        if(sendto(sockfd, &p, MAX_PACKET_SIZE, 0, (struct sockaddr *)&svrAddr, len)==-1) error("Unable to send packet.");
         cout<<"Sending packet "<<x<<endl;
         }
     return 0;

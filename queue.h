@@ -21,6 +21,10 @@ template <typename T> class queue
             pthread_cond_destroy(&m_condv);
             }
 
+        void setQueueSize(int n) {
+            this->max_queue_size = n;
+            }
+
         int add(T item) {
             int success = 1;
             pthread_mutex_lock(&m_mutex);
