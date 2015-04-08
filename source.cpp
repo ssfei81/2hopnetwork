@@ -1,27 +1,24 @@
 #include <iostream>
-#include <string>
+#include <cstring>
 #include <pthread.h>
 #include <sys/socket.h>
+#include <unistd.h>
+#include <sys/time.h>
+#include <cstdlib>
 #include <netinet/in.h>
 #include <netdb.h>
+#include <random>
 #include "packet.h"
 using namespace std;
 
-typedef struct thdata{
-float service_rate;
-} sender_thdata;
-
-typedef struct thdata2{
-int sockfd;
-} receiver_thdata;
-
-void error(char *msg) {
+void error(char *msg) 
+{
     cout<<"Error: "<<msg<<endl;
     exit(1);
-    }
+}
 
 void errorMsg(char *msg)
-    {
+{
     cout<<endl;
     cout<<"Invalid input(s)..."<<endl;
     cout<<"Correct format:"<<endl;
@@ -30,23 +27,17 @@ void errorMsg(char *msg)
     cout<<"<service_delay> The service delay in ms/packet."<<endl;
     cout<<"<sender_ID> The ID of this sender. This can be either 1 or 2."<<endl;
     cout<<"<receiver_ID> The ID of the receiver. This can be either 1 or 2."<<endl;
+    cout<<"<destination addr> The IP address of the receiver."<<endl;
+    cout<<"<destination port> The port number of the receiver."<<endl;
     cout<<"<packet_count> How many packets to be sent."<<endl;
     cout<<endl;
     exit(1);
-    }
-
-void* sender(void *ptr) 
-    {
-    while(1) {
-    }
-    pthread_exit(0);
-    }
-
+}
 
 int main(int argc, char *argv[]) 
-    {
+{
     //socket stuff
-    int sockfd, portno;
+    int sockfd, portno, destportno;
     socklen_t len;
     struct sockaddr_in svrAddr, cliAddr;
     struct hostent *server;
@@ -55,23 +46,21 @@ int main(int argc, char *argv[])
 
     cout<<"************************************"<<endl;
     cout<<"*** Welcome to EE 122 Project #2 ***"<<endl;
-    cout<<"***   Shuo Sun and Gabriel Noob  ***"<<endl;
+    cout<<"***     Shuo Sun and Gabriel     ***"<<endl;
     cout<<"***        Source Program        ***"<<endl;
     cout<<"************************************"<<endl; 
     cout<<"(ctrl + c to exit)"<<endl;
 
     //read from command line
-    if (argc != 7) {
-        errorMsg("Invalid input format"); 
-        }
+    if (argc != 9) errorMsg("Invalid input format"); 
 
     server = gethostbyname(argv[1]);
     if(server==NULL) error("Incorrect server address.");
-    cout<<"Router IP address: "<<argv[2]<<endl;
+    cout<<"Router IP address: "<<argv[1]<<endl;
 
     portno = atoi(argv[2]);
     if(portno > 65535 || portno < 0) error("Incorrect port number.");
-    cout<<"Router port: "<<atoi(argv[3])<<endl;
+    cout<<"Router port: "<<atoi(argv[2])<<endl;
 
     delay = atof(argv[3]);
     if(delay < 0) error("Delay must be >= 0");
@@ -85,7 +74,13 @@ int main(int argc, char *argv[])
     if(receiverID != 1 && receiverID !=2) error("Receiver ID must be 1 or 2.");
     cout<<"Sending packets to receiver "<<receiverID<<"..."<<endl;
 
-    packetCount = atoi(argv[6]);
+    cout<<"Destination IP address: "<<argv[6]<<endl;
+
+    destportno = atoi(argv[7]);
+    if(destportno > 65535 || destportno < 0) error("Incorrect port number.");
+    cout<<"Destination port: "<<destportno<<endl;
+
+    packetCount = atoi(argv[8]);
     if(packetCount <= 0) error("Packet count must be greater than 0.");
     cout<<"Packet count: "<<packetCount<<endl<<endl;
 
@@ -95,6 +90,10 @@ int main(int argc, char *argv[])
     sockfd = socket(AF_INET, SOCK_DGRAM, 0);
     if (sockfd < 0) error("Unable to create socket.");
     cout<<"Done"<<endl;
+
+    //initialize poisson distribution generator
+    std::default_random_engine generator;
+    std::poisson_distribution<int> distribution(delay);
 
     cout<<"Binding socket to port...";
     bzero((char *) &cliAddr, sizeof(cliAddr));
@@ -117,19 +116,19 @@ int main(int argc, char *argv[])
 
     //start sending packets
     for (int x = 1; x <= packetCount; x++)
-        {
-        /************************TO DO ****************************************
-         * * send out with a poisson distribution, with mean of delay ms/packet
-         * *********************************************************************/
-
+    {
         //construct a packet
         packet p;
         p.sequenceNumber = x;
         p.source = senderID;
         p.destination = receiverID;
+        strcpy(p.destinationIP, argv[6]);
+        p.destinationPort = destportno;
 
         if(sendto(sockfd, &p, MAX_PACKET_SIZE, 0, (struct sockaddr *)&svrAddr, len)==-1) error("Unable to send packet.");
         cout<<"Sending packet "<<x<<endl;
-        }
-    return 0;
+        //delay 
+        usleep((int) distribution(generator) * 1000);
     }
+    return 0;
+}

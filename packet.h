@@ -6,5 +6,7 @@ typedef struct apacket{
 int sequenceNumber;
 int source;
 int destination;
-char padding[MAX_PACKET_SIZE - 12];
+char destinationIP[20];
+int destinationPort;
+char padding[MAX_PACKET_SIZE - 36];
 } packet;
