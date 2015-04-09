@@ -20,6 +20,7 @@ queue<packet *> p_queue2(BUFFER_LIMIT);
 
 int sockfd;
 int mode;
+int sumOfQ1, sumOfQ2;
 
 
 typedef struct thdata{
@@ -81,7 +82,7 @@ void* sender(void *ptr)
                 if(sendto(sockfd, &p, MAX_PACKET_SIZE, 0, (struct sockaddr *)&svrAddr1, len1)==-1) error("Unable to send packet.");
                 cout<<"Sending packet "<<endl;
                 //service delay: 10 ms
-                usleep(10000);
+                usleep(5000);
             }
             else
             {
@@ -106,7 +107,7 @@ void* sender(void *ptr)
                 if(sendto(sockfd, &p, MAX_PACKET_SIZE, 0, (struct sockaddr *)&svrAddr2, len2)==-1) error("Unable to send packet.");
                 cout<<"Sending packet "<<endl;
                 //service delay: 10 ms
-                usleep(10000);
+                usleep(5000);
             }
             else 
             {
@@ -143,6 +144,8 @@ int main(int argc, char *argv[])
     struct sockaddr_in svrAddr, cliAddr;
     socklen_t clilen;
     struct hostent *server;
+    sumOfQ1 = 0;
+    sumOfQ2 = 0;
 
     cout<<"************************************"<<endl;
     cout<<"*** Welcome to EE 122 Project #2 ***"<<endl;
@@ -210,7 +213,9 @@ int main(int argc, char *argv[])
         memcpy(pkt, buf, MAX_PACKET_SIZE);
 
         cout<<"Packet "<<pkt->sequenceNumber<<" received from source "<<pkt->source<<", ";
-
+        sumOfQ1 += p_queue1.size();
+        sumOfQ2 += p_queue2.size();
+        cout<<sumOfQ1<<" "<<sumOfQ2<<endl;
         if(mode == 0 || mode == 1) 
         {
             int n = p_queue1.add(pkt);

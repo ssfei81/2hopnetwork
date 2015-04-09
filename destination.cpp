@@ -66,12 +66,12 @@ int main(int argc, char *argv[])
     cout<<"Initializing receiver...Done"<<endl;
     cout<<"Initializing buffer...";
     buf = new char[MAX_PACKET_SIZE];
-
+    int count = 1;
     while(1) 
     {
-        cout<<"Receiving"<<endl;
+        cout<<"Receiving Packet "<< count <<endl;
         int n = recvfrom(sockfd, buf, MAX_PACKET_SIZE, 0, (struct sockaddr *)&cliAddr, &clilen);
-        cout<<buf<<endl;
+        count += 1;
     }
     return 0;
 }
