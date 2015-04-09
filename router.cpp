@@ -192,7 +192,7 @@ int main(int argc, char *argv[])
     svrAddr.sin_family = AF_INET;
     svrAddr.sin_addr.s_addr = INADDR_ANY;
     svrAddr.sin_port = htons(portno);
-    if(bind(sockfd, (struct sockaddr *)&svrAddr, sizeof(svrAddr)) < 0) error("Unable to bind socket to port.");
+    if(::bind(sockfd, (struct sockaddr *)&svrAddr, sizeof(svrAddr)) < 0) error("Unable to bind socket to port.");
     cout<<"Done"<<endl;
 
     cout<<"Initializing sender...";

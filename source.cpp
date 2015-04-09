@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
     cliAddr.sin_family = AF_INET;
     cliAddr.sin_addr.s_addr = htonl(INADDR_ANY);
     cliAddr.sin_port = htons(0);
-    if(bind(sockfd, (struct sockaddr *)&cliAddr, sizeof(cliAddr)) < 0) error("Unable to bind socket to port.");
+    if(::bind(sockfd, (struct sockaddr *)&cliAddr, sizeof(cliAddr)) < 0) error("Unable to bind socket to port.");
     cout<<"Done"<<endl;
 
     //clear buffer
@@ -124,6 +124,11 @@ int main(int argc, char *argv[])
         p.destination = receiverID;
         strcpy(p.destinationIP, argv[6]);
         p.destinationPort = destportno;
+        gettimeofday(&p.tv, NULL);
+
+        unsigned long long msSinceEpoch =
+                (unsigned long long)(p.tv.tv_sec) * 1000 +
+                    (unsigned long long)(p.tv.tv_usec) / 1000;
 
         if(sendto(sockfd, &p, MAX_PACKET_SIZE, 0, (struct sockaddr *)&svrAddr, len)==-1) error("Unable to send packet.");
         cout<<"Sending packet "<<x<<endl;

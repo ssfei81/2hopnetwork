@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
 {
     
     //socket stuff
-    int sockfd, newsockfd, portno;
+    int sockfd, portno;
     socklen_t clilen;
     struct sockaddr_in svrAddr, cliAddr;
     char *buf;
@@ -60,18 +60,34 @@ int main(int argc, char *argv[])
     svrAddr.sin_family = AF_INET;
     svrAddr.sin_addr.s_addr = INADDR_ANY;
     svrAddr.sin_port = htons(portno);
-    if(bind(sockfd, (struct sockaddr *)&svrAddr, sizeof(svrAddr)) < 0) error("Unable to bind socket to port.");
+    if(::bind(sockfd, (struct sockaddr *)&svrAddr, sizeof(svrAddr)) < 0) error("Unable to bind socket to port.");
     cout<<"Done"<<endl;
 
     cout<<"Initializing receiver...Done"<<endl;
     cout<<"Initializing buffer...";
     buf = new char[MAX_PACKET_SIZE];
     int count = 1;
+
+    struct timeval tv;
+
     while(1) 
     {
         cout<<"Receiving Packet "<< count <<endl;
         int n = recvfrom(sockfd, buf, MAX_PACKET_SIZE, 0, (struct sockaddr *)&cliAddr, &clilen);
         count += 1;
+        //cal delay
+        gettimeofday(&tv, NULL);
+        unsigned long long msSinceEpoch =
+                (unsigned long long)(tv.tv_sec) * 1000 +
+                    (unsigned long long)(tv.tv_usec) / 1000;
+
+        packet *p = (packet *)buf;
+        unsigned long long msSinceEpoch2 =
+                (unsigned long long)(p->tv.tv_sec) * 1000 +
+                    (unsigned long long)(p->tv.tv_usec) / 1000;
+
+        unsigned long long delay = msSinceEpoch2 - msSinceEpoch;
+        cout<<delay<<endl;
     }
     return 0;
 }
