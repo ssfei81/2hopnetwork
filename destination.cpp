@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
     int count = 1;
 
     struct timeval tv;
-
+    int delaySum = 0;
     while(1) 
     {
         cout<<"Receiving Packet "<< count <<endl;
@@ -86,8 +86,10 @@ int main(int argc, char *argv[])
                 (unsigned long long)(p->tv.tv_sec) * 1000 +
                     (unsigned long long)(p->tv.tv_usec) / 1000;
 
-        unsigned long long delay = msSinceEpoch2 - msSinceEpoch;
-        cout<<delay<<endl;
+        unsigned long long delay = msSinceEpoch - msSinceEpoch2;
+        //cout<<delay<<endl;
+        delaySum += delay;
+        cout<<delaySum<<endl;
     }
     return 0;
 }

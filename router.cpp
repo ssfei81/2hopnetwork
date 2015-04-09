@@ -11,7 +11,7 @@
 #include <netdb.h>
 using namespace std;
 
-#define BUFFER_LIMIT 64
+#define BUFFER_LIMIT 32
 #define MAX_BUFFER_SIZE 200
 
 //initialize the queues
@@ -82,7 +82,7 @@ void* sender(void *ptr)
                 if(sendto(sockfd, &p, MAX_PACKET_SIZE, 0, (struct sockaddr *)&svrAddr1, len1)==-1) error("Unable to send packet.");
                 cout<<"Sending packet "<<endl;
                 //service delay: 10 ms
-                usleep(5000);
+                usleep(15000);
             }
             else
             {
@@ -107,7 +107,7 @@ void* sender(void *ptr)
                 if(sendto(sockfd, &p, MAX_PACKET_SIZE, 0, (struct sockaddr *)&svrAddr2, len2)==-1) error("Unable to send packet.");
                 cout<<"Sending packet "<<endl;
                 //service delay: 10 ms
-                usleep(5000);
+                usleep(15000);
             }
             else 
             {
