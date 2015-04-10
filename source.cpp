@@ -26,7 +26,6 @@ void errorMsg(char *msg)
     cout<<"<router port> The port number of the router."<<endl;
     cout<<"<service_delay> The service delay in ms/packet."<<endl;
     cout<<"<sender_ID> The ID of this sender. This can be either 1 or 2."<<endl;
-    cout<<"<receiver_ID> The ID of the receiver. This can be either 1 or 2."<<endl;
     cout<<"<destination addr> The IP address of the receiver."<<endl;
     cout<<"<destination port> The port number of the receiver."<<endl;
     cout<<"<packet_count> How many packets to be sent."<<endl;
@@ -52,7 +51,7 @@ int main(int argc, char *argv[])
     cout<<"(ctrl + c to exit)"<<endl;
 
     //read from command line
-    if (argc != 9) errorMsg("Invalid input format"); 
+    if (argc != 8) errorMsg("Invalid input format"); 
 
     server = gethostbyname(argv[1]);
     if(server==NULL) error("Incorrect server address.");
@@ -70,17 +69,16 @@ int main(int argc, char *argv[])
     if(senderID != 1 && senderID != 2) error("Server ID must be 1 or 2.");
     cout<<"Sender ID: "<<senderID<<endl;
 
-    receiverID = atoi(argv[5]);
-    if(receiverID != 1 && receiverID !=2) error("Receiver ID must be 1 or 2.");
+    receiverID = senderID;
     cout<<"Sending packets to receiver "<<receiverID<<"..."<<endl;
 
-    cout<<"Destination IP address: "<<argv[6]<<endl;
+    cout<<"Destination IP address: "<<argv[5]<<endl;
 
-    destportno = atoi(argv[7]);
+    destportno = atoi(argv[6]);
     if(destportno > 65535 || destportno < 0) error("Incorrect port number.");
     cout<<"Destination port: "<<destportno<<endl;
 
-    packetCount = atoi(argv[8]);
+    packetCount = atoi(argv[7]);
     if(packetCount <= 0) error("Packet count must be greater than 0.");
     cout<<"Packet count: "<<packetCount<<endl<<endl;
 
@@ -122,7 +120,7 @@ int main(int argc, char *argv[])
         p.sequenceNumber = x;
         p.source = senderID;
         p.destination = receiverID;
-        strcpy(p.destinationIP, argv[6]);
+        strcpy(p.destinationIP, argv[5]);
         p.destinationPort = destportno;
         gettimeofday(&p.tv, NULL);
 

@@ -11,7 +11,7 @@
 #include <netdb.h>
 using namespace std;
 
-#define BUFFER_LIMIT 32
+#define BUFFER_LIMIT 64
 #define MAX_BUFFER_SIZE 200
 
 //initialize the queues
@@ -55,6 +55,7 @@ void* sender(void *ptr)
     bool dest2saved = false;
     packet p;
     int prioritycount = 0;
+    int prioritycap = 2;
         
     while(1) 
     {
@@ -64,7 +65,8 @@ void* sender(void *ptr)
         } 
         else if (mode == 2)
         {
-            if ((p_queue2.size() > 0 && prioritycount > 2) || p_queue1.size() == 0) 
+            while (p_queue1.size() == 0 && p_queue2.size() == 0) {}
+            if ((p_queue2.size() > 0 && prioritycount > prioritycap) || p_queue1.size() == 0) 
             {
                 p = *p_queue2.pop();
                 prioritycount = 0;
@@ -81,8 +83,8 @@ void* sender(void *ptr)
             {
                 if(sendto(sockfd, &p, MAX_PACKET_SIZE, 0, (struct sockaddr *)&svrAddr1, len1)==-1) error("Unable to send packet.");
                 cout<<"Sending packet "<<endl;
-                //service delay: 10 ms
-                usleep(15000);
+                //service delay default: 10 ms
+                usleep(10000);
             }
             else
             {
@@ -106,8 +108,8 @@ void* sender(void *ptr)
             {
                 if(sendto(sockfd, &p, MAX_PACKET_SIZE, 0, (struct sockaddr *)&svrAddr2, len2)==-1) error("Unable to send packet.");
                 cout<<"Sending packet "<<endl;
-                //service delay: 10 ms
-                usleep(15000);
+                //service delay default: 10 ms
+                usleep(10000);
             }
             else 
             {
@@ -123,7 +125,7 @@ void* sender(void *ptr)
                 len2 = sizeof(svrAddr2);
                 dest2saved = true;
             }
- 
+
         }
     }
     pthread_exit(0);

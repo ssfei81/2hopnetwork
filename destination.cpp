@@ -19,7 +19,6 @@ void errorMsg(char *msg)
     cout<<endl;
     cout<<"Invalid input(s)..."<<endl;
     cout<<"Correct format:"<<endl;
-    cout<<"<receiver id> 1 or 2."<<endl;
     cout<<"<portno> port number."<<endl;
     cout<<endl;
     exit(1);
@@ -42,9 +41,9 @@ int main(int argc, char *argv[])
     cout<<"(ctrl + c to exit)"<<endl;
 
     //read from command line
-    if (argc != 3) errorMsg("Invalid input format"); 
+    if (argc != 2) errorMsg("Invalid input format"); 
 
-    portno = atoi(argv[2]);
+    portno = atoi(argv[1]);
     if(portno > 65535 || portno < 0) error("Port number must be between 0 - 65535");
     cout<<"Port number: "<<portno<<endl;
 
